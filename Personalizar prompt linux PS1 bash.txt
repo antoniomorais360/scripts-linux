@@ -1,0 +1,39 @@
+
+# Adicionar em todos os usuários
+# Para adicionar: nano ~/.bashrc
+# Reprocessar: source ~/.bashrc
+
+# Para salvar o status do último comando do prompt
+prompt_status() {
+    local last_exit_code="$?" # Armazena o status de saída do último comando executado
+    if [[ $last_exit_code -eq 0 ]]; then
+        echo -e "\e[1;32m√"
+    else
+        echo -e "\033[48;5;95;38;5;214m🚩:$last_exit_code\e[0m"
+    fi
+}
+
+# Customização do prompt
+prompt_customization() {
+    local user_symbol color_user color_path prompt_symbol
+    if [[ $EUID -eq 0 ]]; then
+        user_symbol='💀' # Substitua ROOT_SYMBOL pelo emoji ou símbolo desejado para root
+        color_user='\e[1;31m' # Vermelho para root
+        color_path='\e[1;93m' # Amarelo para o caminho do root
+        prompt_symbol='#'
+    else
+        user_symbol='🐧' # Substitua USER_SYMBOL pelo emoji ou símbolo desejado para usuários normais
+        color_user='\e[01;92m' # Verde para usuários normais
+        color_path='\e[01;96m' # Ciano para o caminho de usuários normais
+        prompt_symbol='$'
+    fi
+    echo -e "${color_user}\u${user_symbol}\h\033[00m:${color_path}\w\033[0m${prompt_symbol} "
+}
+
+export PS1="\$(prompt_status) \[$(prompt_customization)\]"
+
+# Mudar a cor da listagem dos diretórios para cyan
+export LS_COLORS=$LS_COLORS:'di=01;36:'
+
+
+

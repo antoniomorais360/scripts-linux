@@ -2,38 +2,57 @@
 # Adicionar em todos os usuários
 # Para adicionar: nano ~/.bashrc
 # Reprocessar: source ~/.bashrc
+# \n└─ Ajusta para proxima linha
 
-# Para salvar o status do último comando do prompt
 prompt_status() {
-    local last_exit_code="$?" # Armazena o status de saída do último comando executado
+    local last_exit_code="$?"
+    local status_color status_symbol
+    # Determina a cor e o símbolo baseados no resultado do último comando executado.
     if [[ $last_exit_code -eq 0 ]]; then
-        echo -e "\e[1;32m√"
+        status_color="\[\e[1;32m\]" # Verde para indicar sucesso.
+        status_symbol="√"
     else
-        echo -e "\033[48;5;95;38;5;214m🚩:$last_exit_code\e[0m"
+        status_color="\[\e[48;5;95;38;5;214m\]" # Cor personalizada para erro, com fundo e texto coloridos.
+        status_symbol="🚩:$last_exit_code"
     fi
+
+    # Constrói a parte dinâmica do PS1, mostrando o status do último comando.
+    PS1="${status_color}${status_symbol}\[\e[0m\] "
 }
 
-# Customização do prompt
-prompt_customization() {
-    local user_symbol color_user color_path prompt_symbol
+# Define a configuração de cores e símbolos do usuário para o prompt.
+user_prompt_customization() {
+    local user_color user_symbol path_color prompt_symbol
+
     if [[ $EUID -eq 0 ]]; then
-        user_symbol='💀' # Substitua ROOT_SYMBOL pelo emoji ou símbolo desejado para root
-        color_user='\e[1;31m' # Vermelho para root
-        color_path='\e[1;93m' # Amarelo para o caminho do root
+        # Configurações para o usuário root
+        user_color="\[\e[1;31m\]" # Vermelho para o nome de usuário root.
+        user_symbol='💀' # Símbolo de caveira para root.
+        path_color="\[\e[1;93m\]" # Caminho do diretório em amarelo para root.
         prompt_symbol='#'
     else
-        user_symbol='🐧' # Substitua USER_SYMBOL pelo emoji ou símbolo desejado para usuários normais
-        color_user='\e[01;92m' # Verde para usuários normais
-        color_path='\e[01;96m' # Ciano para o caminho de usuários normais
+        # Configurações para usuários normais
+        user_color="\[\e[1;92m\]" # Verde para o nome de usuário normal.
+        user_symbol='🐧' # Símbolo de pinguim para usuários normais.
+        path_color="\[\e[1;96m\]" # Caminho do diretório em ciano para usuários normais.
         prompt_symbol='$'
     fi
-    echo -e "${color_user}\u${user_symbol}\h\033[00m:${color_path}\w\033[0m \n└─${prompt_symbol} "
+
+    # Adiciona a cor do usuário, símbolo, nome do host, cor do caminho e símbolo do prompt ao PS1.
+    PS1+="${user_color}\u${user_symbol} \h ${path_color}\w \n└─${prompt_symbol} \[\e[0m\]"
 }
 
-export PS1="\$(prompt_status) \[$(prompt_customization)\]"
+# Inicializa o prompt com status e customização do usuário.
+prompt_init() {
+    prompt_status
+    user_prompt_customization
+}
+
+# Atualiza o prompt antes de exibir cada novo prompt.
+PROMPT_COMMAND=prompt_init
+
 
 # Mudar a cor da listagem dos diretórios para cyan
 export LS_COLORS=$LS_COLORS:'di=01;36:'
-
 
 

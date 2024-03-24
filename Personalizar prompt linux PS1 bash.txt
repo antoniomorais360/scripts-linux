@@ -27,7 +27,7 @@ prompt_customization() {
         color_path='\e[01;96m' # Ciano para o caminho de usuários normais
         prompt_symbol='$'
     fi
-    echo -e "${color_user}\u${user_symbol}\h\033[00m:${color_path}\w\033[0m${prompt_symbol} "
+    echo -e "${color_user}\u${user_symbol}\h\033[00m:${color_path}\w\033[0m \n└─${prompt_symbol} "
 }
 
 export PS1="\$(prompt_status) \[$(prompt_customization)\]"
